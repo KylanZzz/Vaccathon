@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         //test button to draw card
         val testButton = findViewById<Button>(R.id.testButton)
         testButton.setOnClickListener(){
-            game.userDrawCard()
+            game.runner()
             updateBoard()
         }
     }

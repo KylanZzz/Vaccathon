@@ -29,13 +29,13 @@ class Game() {
     private fun initializeDeck(): Unit{
         var condensedDeck = ArrayList<Pair<CardType,Int>>()
 
-        // do not remove this bro
+        // always have one of these on
         condensedDeck.add(Pair(CardType.SYRINGE, 40))
+//        condensedDeck.add(Pair(CardType.MONEY, 40))
 
         //change these instead
-        condensedDeck.add(Pair(CardType.MONEY, 40))
-        condensedDeck.add(Pair(CardType.COVID19, 40))
-
+        condensedDeck.add(Pair(CardType.PLAGUE, 20))
+        condensedDeck.add(Pair(CardType.VITAMINC, 20))
         for (pair in condensedDeck){
             for (j in 1..pair.second){
                 gameDeck.add(pair.first)
@@ -44,46 +44,70 @@ class Game() {
     }
 
     public fun playCard(player: Player, card: CardType){
-        var shouldDraw: Boolean = true
+        var shouldDraw: Boolean = false
 
         when (card){
             CardType.ADVIL -> if(checkStatus(player.status, StatusType.COLD)) {
                 removeCard(player.hand, CardType.ADVIL)
                 removeStatus(player.status, StatusType.COLD)
+                shouldDraw = true
             }
             CardType.SYRINGE -> if (player.hand.count{it == CardType.SYRINGE} >= 3){
                 removeCard(player.hand, CardType.SYRINGE)
                 removeCard(player.hand, CardType.SYRINGE)
                 removeCard(player.hand, CardType.SYRINGE)
                 player.hand.add(CardType.MEDKIT)
+                shouldDraw = true
             }
             CardType.MEDKIT -> if (player.status.isNotEmpty()){
-                if (!(player.status[0].first == StatusType.PROTECTED && player.status.count() == 1)) {
+
+                if (player.status.any{it.first != StatusType.PROTECTED && it.first != StatusType.HEART_ATTACK}) {
                     val tempIndexList: ArrayList<Int> = ArrayList<Int>()
                     for (i in 0..<player.status.count()){
-                        if (player.status[i].first != StatusType.PROTECTED) tempIndexList.add(i)
+                        if (player.status[i].first != StatusType.PROTECTED && player.status[i].first != StatusType.HEART_ATTACK) tempIndexList.add(i)
                     }
                     for (j in tempIndexList.reversed()){
                         player.status.removeAt(j)
                     }
+                    shouldDraw = true
                 }
+//                if (!(player.status[0].first == StatusType.PROTECTED && player.status.count() == 1)) {
+//                    val tempIndexList: ArrayList<Int> = ArrayList<Int>()
+//                    for (i in 0..<player.status.count()){
+//                        if (player.status[i].first != StatusType.PROTECTED) tempIndexList.add(i)
+//                    }
+//                    for (j in tempIndexList.reversed()){
+//                        player.status.removeAt(j)
+//                    }
+//                    shouldDraw = true
+//                }
             }
             CardType.MASK -> if(checkStatus(player.status, StatusType.COVID)) {
                 removeCard(player.hand, CardType.MASK)
                 removeStatus(player.status, StatusType.COVID)
+                shouldDraw = true
             }
             CardType.HAZMATSUIT -> if(!checkStatus(player.status, StatusType.PROTECTED)){
                 player.status.add(Pair(StatusType.PROTECTED, StatusType.PROTECTED.turns))
+                shouldDraw = true
             }
-            CardType.MONEY -> if (player.hand.count{it == CardType.SYRINGE} >= 2){ // add action later that allows user to select what to add
+            CardType.MONEY -> if (player.hand.count{it == CardType.MONEY} >= 2){ // add action later that allows user to select what to add
                 removeCard(player.hand, CardType.MONEY)
                 removeCard(player.hand, CardType.MONEY)
                 player.hand.add(CardType.HAZMATSUIT)
+                shouldDraw = true
             }
-            else -> shouldDraw = false
+            CardType.VITAMINC -> if(checkStatus(player.status, StatusType.PLAGUE)) {
+                removeCard(player.hand, CardType.VITAMINC)
+                removeStatus(player.status, StatusType.PLAGUE)
+                shouldDraw = true
+            }
+//            CardType.SNEEZE -> //implement action
+//            CardType.SCARE -> // implemenet action
+            else -> null
         }
 
-        if (shouldDraw) userDrawCard()
+        if (shouldDraw) runner()
     }
 
     private fun drawCard(player: Player){
@@ -103,10 +127,21 @@ class Game() {
         gameDeck.removeAt(index)
     }
 
-    public fun userDrawCard(){
+    public fun runner(){
         drawCard(user)
 
         // call bots to do stuff
+
+
+        // calculate new hp of user
+        calculateNewHp(user)
+    }
+    private fun calculateNewHp(player: Player) {
+        for (statusPair in player.status){
+            if (statusPair.first != StatusType.PROTECTED){
+                statusPair.second =
+            }
+        }
     }
 
     private fun checkStatus(statusList: ArrayList<Pair<StatusType, Int>>, status: StatusType): Boolean {
@@ -150,6 +185,10 @@ class Game() {
         //set user to first player in playerList
         user = playersList[0]
 
+        //give random statuses to user
+        user.status.add(Pair(StatusType.HEART_ATTACK, 10))
+        user.status.add(Pair(StatusType.CANCER, 10))
+        user.status.add(Pair(StatusType.PROTECTED, 10))
     }
     private fun createHand(player: Player){
         for (i in 0..<startingCards){
