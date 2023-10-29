@@ -11,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.setMargins
 import javax.net.ssl.SSLEngineResult.Status
 
 class MainActivity : AppCompatActivity() {
@@ -21,7 +22,15 @@ class MainActivity : AppCompatActivity() {
     private lateinit var leftStatusLayout: LinearLayout
     private lateinit var rightStatusLayout: LinearLayout
     private lateinit var topStatusLayout: LinearLayout
-    private val game = Game()
+
+    private lateinit var chooseCardLayout: LinearLayout
+
+    private lateinit var rightHeartCount: TextView
+    private lateinit var topHeartCount: TextView
+    private lateinit var leftHeartCount: TextView
+
+
+    private val game = Game(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +43,12 @@ class MainActivity : AppCompatActivity() {
         leftStatusLayout = findViewById<LinearLayout>(R.id.leftStatusLayout)
         rightStatusLayout  = findViewById<LinearLayout>(R.id.rightStatusLayout)
         topStatusLayout = findViewById<LinearLayout>(R.id.topStatusLayout)
+
+        chooseCardLayout = findViewById<LinearLayout>(R.id.chooseCardLayout)
+
+        rightHeartCount = findViewById<TextView>(R.id.rightPlayerHeartCount)
+        topHeartCount = findViewById<TextView>(R.id.topPlayerHeartCount)
+        leftHeartCount = findViewById<TextView>(R.id.leftPlayerHeartCount)
 
         generateHealthBar(10)
         createOtherHands()
@@ -48,13 +63,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateBoard(){
+    public fun updateBoard(){
         updateUserHand()
         updateAllStatuses()
-//        updateAllHealthPoints()
+        updateAllHealthPoints()
     }
 
     private fun updateAllHealthPoints(){
+        healthBarLayout.removeAllViews()
+
+        for (num in 1..game.user.lifePoints){
+            addLifePoint()
+        }
+
+        rightHeartCount.text = "x${game.getPlayerList()[1].lifePoints}"
+        topHeartCount.text = "x${game.getPlayerList()[2].lifePoints}"
+        leftHeartCount.text = "x${game.getPlayerList()[3].lifePoints}"
 
     }
 
@@ -174,5 +198,57 @@ class MainActivity : AppCompatActivity() {
         for (i in 1..numHearts){
             addLifePoint()
         }
+    }
+
+    fun clearChoiceLayout(){
+        chooseCardLayout.removeAllViews()
+    }
+
+    fun getPlayerChoice(card: CardType) {
+        //create selectoin screen
+        fun createCardLayoutParams(width: Int, height: Int): LinearLayout.LayoutParams {
+            return LinearLayout.LayoutParams(width, height).apply {
+                setMargins(50, 50, 50, 50)
+                // Any additional layout parameters can be set here
+            }
+        }
+
+        // create views
+
+        val firstPlayerCard = LayoutInflater.from(this).inflate(R.layout.card_view, playerHandLayout, false)
+        val layoutParams0 = createCardLayoutParams(500, 833) // replace with your desired width and height
+        firstPlayerCard.layoutParams = layoutParams0
+        val textBox0 = firstPlayerCard.findViewById<TextView>(R.id.cardLabel)
+        textBox0.text = "Player 2"
+        val imageBox0 = firstPlayerCard.findViewById<ImageView>(R.id.cardImage)
+        imageBox0.setImageResource(card.imgId)
+        firstPlayerCard.setOnClickListener{
+            game.attack(card, 1)
+        }
+        chooseCardLayout.addView(firstPlayerCard)
+
+        val secondPlayerCard = LayoutInflater.from(this).inflate(R.layout.card_view, playerHandLayout, false)
+        val layoutParams1 = createCardLayoutParams(500, 833) // replace with your desired width and height
+        secondPlayerCard.layoutParams = layoutParams1
+        val textBox1 = secondPlayerCard.findViewById<TextView>(R.id.cardLabel)
+        textBox1.text = "Player 3"
+        val imageBox1 = secondPlayerCard.findViewById<ImageView>(R.id.cardImage)
+        imageBox1.setImageResource(card.imgId)
+        secondPlayerCard.setOnClickListener{
+            game.attack(card, 2)
+        }
+        chooseCardLayout.addView(secondPlayerCard)
+
+        val thirdPlayerCard = LayoutInflater.from(this).inflate(R.layout.card_view, playerHandLayout, false)
+        val layoutParams2 = createCardLayoutParams(500, 833) // replace with your desired width and height
+        thirdPlayerCard.layoutParams = layoutParams2
+        val textBox2 = thirdPlayerCard.findViewById<TextView>(R.id.cardLabel)
+        textBox2.text = "Player 4"
+        val imageBox2 = thirdPlayerCard.findViewById<ImageView>(R.id.cardImage)
+        imageBox2.setImageResource(card.imgId)
+        thirdPlayerCard.setOnClickListener{
+            game.attack(card, 3)
+        }
+        chooseCardLayout.addView(thirdPlayerCard)
     }
 }

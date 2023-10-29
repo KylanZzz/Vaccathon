@@ -3,7 +3,7 @@ package com.example.vaccathon
 import javax.net.ssl.SSLEngineResult.Status
 import kotlin.random.Random
 
-class Game() {
+class Game(private val activity: MainActivity) {
     private var gameOver: Boolean = false
     private var turn: Int = 0
     private var gameDeck: ArrayList<CardType> = ArrayList()
@@ -34,8 +34,7 @@ class Game() {
 //        condensedDeck.add(Pair(CardType.MONEY, 40))
 
         //change these instead
-        condensedDeck.add(Pair(CardType.PLAGUE, 20))
-        condensedDeck.add(Pair(CardType.VITAMINC, 20))
+        condensedDeck.add(Pair(CardType.SNEEZE, 20))
         for (pair in condensedDeck){
             for (j in 1..pair.second){
                 gameDeck.add(pair.first)
@@ -62,6 +61,7 @@ class Game() {
             CardType.MEDKIT -> if (player.status.isNotEmpty()){
 
                 if (player.status.any{it.first != StatusType.PROTECTED && it.first != StatusType.HEART_ATTACK}) {
+                    removeCard(player.hand, CardType.MEDKIT)
                     val tempIndexList: ArrayList<Int> = ArrayList<Int>()
                     for (i in 0..<player.status.count()){
                         if (player.status[i].first != StatusType.PROTECTED && player.status[i].first != StatusType.HEART_ATTACK) tempIndexList.add(i)
@@ -102,12 +102,24 @@ class Game() {
                 removeStatus(player.status, StatusType.PLAGUE)
                 shouldDraw = true
             }
-//            CardType.SNEEZE -> //implement action
+            CardType.SNEEZE -> {
+                removeCard(player.hand, CardType.SNEEZE)
+                activity.getPlayerChoice(CardType.SNEEZE)
+                shouldDraw = true
+            }
 //            CardType.SCARE -> // implemenet action
             else -> null
         }
 
         if (shouldDraw) runner()
+    }
+
+    fun attack(card: CardType, atkTarget: Int){
+        if ( !checkStatus(playersList[atkTarget].status, StatusType.HEART_ATTACK) ){
+            playersList[atkTarget].status.add(Pair(StatusType.HEART_ATTACK, 1))
+            activity.clearChoiceLayout()
+        }
+        activity.updateBoard()
     }
 
     private fun drawCard(player: Player){
@@ -128,19 +140,29 @@ class Game() {
     }
 
     public fun runner(){
+        //end the users turn
+        calculateNewHp(user)
         drawCard(user)
 
         // call bots to do stuff
-
-
-        // calculate new hp of user
-        calculateNewHp(user)
+        calculateNewHp(playersList[1])
+        calculateNewHp(playersList[2])
+        calculateNewHp(playersList[3])
     }
     private fun calculateNewHp(player: Player) {
-        for (statusPair in player.status){
-            if (statusPair.first != StatusType.PROTECTED){
-                statusPair.second =
-            }
+        for (index in 0..<player.status.count()){
+            val statusPair = player.status[index]
+            player.lifePoints -= 1
+            player.status[index] = Pair(statusPair.first, statusPair.second - 1)
+        }
+
+        val tempIndexList: ArrayList<Int> = ArrayList<Int>()
+
+        for (index in 0..<player.status.count()){
+            if (player.status[index].second == 0) tempIndexList.add(index)
+        }
+        for (index in tempIndexList.reversed()){
+            player.status.removeAt(index)
         }
     }
 
@@ -186,15 +208,14 @@ class Game() {
         user = playersList[0]
 
         //give random statuses to user
-        user.status.add(Pair(StatusType.HEART_ATTACK, 10))
-        user.status.add(Pair(StatusType.CANCER, 10))
-        user.status.add(Pair(StatusType.PROTECTED, 10))
     }
+
     private fun createHand(player: Player){
         for (i in 0..<startingCards){
             drawCard(player)
         }
     }
+
     private fun checkGameOver(): Boolean{
         return user.lifePoints == 0
     }
