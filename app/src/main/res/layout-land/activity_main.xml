@@ -28,6 +28,14 @@
             android:layout_height="match_parent"
             android:background="@color/lightRed">
 
+            <Button
+                android:id="@+id/testButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Test Button"
+                tools:layout_editor_absoluteX="308dp"
+                tools:layout_editor_absoluteY="171dp" />
+
             <ImageView
                 android:id="@+id/rightPlayerHeartIcon"
                 android:layout_width="120px"

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -38,6 +39,13 @@ class MainActivity : AppCompatActivity() {
         createOtherHands()
 
         updateBoard()
+
+        //test button to draw card
+        val testButton = findViewById<Button>(R.id.testButton)
+        testButton.setOnClickListener(){
+            game.userDrawCard()
+            updateBoard()
+        }
     }
 
     private fun updateBoard(){
@@ -120,10 +128,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addStatus(playerStatus: LinearLayout, status: StatusType){
-        val statusView = ImageView(this)
+//        val statusView = ImageView(this)
+//
+//        statusView.setImageResource(status.imgId)
+//        statusView.layoutParams = LinearLayout.LayoutParams(120,120)
+//
+//        playerStatus.addView(statusView)
 
-        statusView.setImageResource(status.imgId)
-        statusView.layoutParams = LinearLayout.LayoutParams(120,120)
+        //temp code so i can see what each status is
+        val statusView = TextView(this)
+
+        statusView.text = status.name
+        statusView.textSize = 14.0f
+        statusView.layoutParams = LinearLayout.LayoutParams(170,120)
 
         playerStatus.addView(statusView)
     }
@@ -138,7 +155,7 @@ class MainActivity : AppCompatActivity() {
         imageBox.setImageResource(card.imgId)
 
         cardView.setOnClickListener{
-            game.playCard(card)
+            game.playCard(game.user, card)
             updateBoard()
         }
 
