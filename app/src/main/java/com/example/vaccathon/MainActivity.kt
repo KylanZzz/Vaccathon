@@ -1,6 +1,8 @@
 package com.example.vaccathon
 
 import android.app.ActionBar.LayoutParams
+import android.graphics.Color
+import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -50,17 +52,48 @@ class MainActivity : AppCompatActivity() {
         topHeartCount = findViewById<TextView>(R.id.topPlayerHeartCount)
         leftHeartCount = findViewById<TextView>(R.id.leftPlayerHeartCount)
 
+
+        val deckPile = LayoutInflater.from(this).inflate(R.layout.card_view, fieldLayout, false)
+        fieldLayout.addView(deckPile)
+        val imageView = ImageView(this)
+        val layoutParams = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.MATCH_PARENT,
+            ConstraintLayout.LayoutParams.MATCH_PARENT
+        )
+        imageView.layoutParams = layoutParams
+        imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+        imageView.setImageResource(R.drawable.cardback)
+        deckPile.background = imageView.drawable
+
+
+        val deckLayoutParams = ConstraintLayout.LayoutParams(
+            220,
+            330
+        )
+        deckPile.setOnClickListener(){
+            game.runner()
+            updateBoard()
+        }
+        deckLayoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+        deckLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+        deckLayoutParams.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+        deckLayoutParams.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+        deckLayoutParams.horizontalBias = 0.5f
+        deckLayoutParams.verticalBias= 0.42f
+        deckPile.layoutParams = deckLayoutParams
+
+
         generateHealthBar(10)
         createOtherHands()
 
         updateBoard()
 
         //test button to draw card
-        val testButton = findViewById<Button>(R.id.testButton)
-        testButton.setOnClickListener(){
-            game.runner()
-            updateBoard()
-        }
+//        val testButton = findViewById<Button>(R.id.testButton)
+//        testButton.setOnClickListener(){
+//            game.runner()
+//            updateBoard()
+//        }
     }
 
     public fun updateBoard(){
@@ -114,19 +147,31 @@ class MainActivity : AppCompatActivity() {
 
     private fun createOtherHands(){
         val rightHand = LayoutInflater.from(this).inflate(R.layout.card_view, fieldLayout, false)
+
         rightHand.rotation=270.0f
         fieldLayout.addView(rightHand)
         val rightLayoutParams = ConstraintLayout.LayoutParams(
-            220,
-            367,
+            220, //220
+            367, //367
         )
         rightLayoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
         rightLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
         rightLayoutParams.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
         rightHand.layoutParams = rightLayoutParams
+        val imageViewR = ImageView(this)
+        val layoutParamsR = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.MATCH_PARENT,
+            ConstraintLayout.LayoutParams.MATCH_PARENT
+        )
+        imageViewR.layoutParams = layoutParamsR
+        imageViewR.scaleType = ImageView.ScaleType.CENTER_CROP
+        imageViewR.setImageResource(R.drawable.cardback)
+        rightHand.background = imageViewR.drawable
+
+
 
         val leftHand = LayoutInflater.from(this).inflate(R.layout.card_view, fieldLayout, false)
-        leftHand.rotation=270.0f
+        leftHand.rotation=90.0f
         fieldLayout.addView(leftHand)
         val leftLayoutParams = ConstraintLayout.LayoutParams(
             220,
@@ -136,37 +181,56 @@ class MainActivity : AppCompatActivity() {
         leftLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
         leftLayoutParams.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
         leftHand.layoutParams = leftLayoutParams
+        val imageViewL = ImageView(this)
+        val layoutParamsL = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.MATCH_PARENT,
+            ConstraintLayout.LayoutParams.MATCH_PARENT
+        )
+        imageViewL.layoutParams = layoutParamsL
+        imageViewL.scaleType = ImageView.ScaleType.CENTER_CROP
+        imageViewL.setImageResource(R.drawable.cardback)
+        leftHand.background = imageViewL.drawable
 
 
         val topHand = LayoutInflater.from(this).inflate(R.layout.card_view, fieldLayout, false)
-        topHand.rotation=270.0f
+        topHand.rotation=180.0f
         fieldLayout.addView(topHand)
         val topLayoutParams = ConstraintLayout.LayoutParams(
-            367,
             220,
+            330,
         )
         topLayoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
         topLayoutParams.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
         topLayoutParams.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
         topHand.layoutParams = topLayoutParams
+        val imageViewT = ImageView(this)
+        val layoutParamsT = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.MATCH_PARENT,
+            ConstraintLayout.LayoutParams.MATCH_PARENT
+        )
+        imageViewT.layoutParams = layoutParamsT
+        imageViewT.scaleType = ImageView.ScaleType.CENTER_CROP
+        imageViewT.setImageResource(R.drawable.cardback)
+        topHand.background = imageViewT.drawable
+
     }
 
     private fun addStatus(playerStatus: LinearLayout, status: StatusType){
-//        val statusView = ImageView(this)
-//
-//        statusView.setImageResource(status.imgId)
-//        statusView.layoutParams = LinearLayout.LayoutParams(120,120)
-//
-//        playerStatus.addView(statusView)
+        val statusView = ImageView(this)
 
-        //temp code so i can see what each status is
-        val statusView = TextView(this)
-
-        statusView.text = status.name
-        statusView.textSize = 14.0f
-        statusView.layoutParams = LinearLayout.LayoutParams(170,120)
+        statusView.setImageResource(status.imgId)
+        statusView.layoutParams = LinearLayout.LayoutParams(120,120)
 
         playerStatus.addView(statusView)
+
+        //temp code so i can see what each status is
+//        val statusView = TextView(this)
+//
+//        statusView.text = status.name
+//        statusView.textSize = 14.0f
+//        statusView.layoutParams = LinearLayout.LayoutParams(170,120)
+//
+//        playerStatus.addView(statusView)
     }
 
     private fun addCardToHand(card: CardType){
@@ -183,6 +247,8 @@ class MainActivity : AppCompatActivity() {
             updateBoard()
         }
 
+
+//        cardView.setBackgroundColor(Color.parseColor("@color/"))
         playerHandLayout.addView(cardView)
     }
 
@@ -204,8 +270,31 @@ class MainActivity : AppCompatActivity() {
         chooseCardLayout.removeAllViews()
     }
 
+    fun gameOverScreen(userWon: Boolean){
+        chooseCardLayout.removeAllViews()
+
+        fun createCardLayoutParams(width: Int, height: Int): LinearLayout.LayoutParams {
+            return LinearLayout.LayoutParams(width, height).apply {
+                setMargins(50, 50, 50, 50)
+                // Any additional layout parameters can be set here
+            }
+        }
+
+        val thirdPlayerCard = LayoutInflater.from(this).inflate(R.layout.card_view, playerHandLayout, false)
+        val layoutParams2 = createCardLayoutParams(500, 833) // replace with your desired width and height
+        thirdPlayerCard.layoutParams = layoutParams2
+        val textBox2 = thirdPlayerCard.findViewById<TextView>(R.id.cardLabel)
+        var winLossText: String = "Lost. :("
+        textBox2.textSize = 10f
+        if(userWon) winLossText = "Won!"
+//        textBox2.text = "Game Over \n You $winLossText"
+        val imageBox2 = thirdPlayerCard.findViewById<ImageView>(R.id.cardImage)
+        imageBox2.setImageResource(R.drawable.game_over)
+        chooseCardLayout.addView(thirdPlayerCard)
+    }
+
     fun getPlayerChoice(card: CardType) {
-        //create selectoin screen
+        //create selection screen
         fun createCardLayoutParams(width: Int, height: Int): LinearLayout.LayoutParams {
             return LinearLayout.LayoutParams(width, height).apply {
                 setMargins(50, 50, 50, 50)
@@ -214,18 +303,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         // create views
-
-        val firstPlayerCard = LayoutInflater.from(this).inflate(R.layout.card_view, playerHandLayout, false)
-        val layoutParams0 = createCardLayoutParams(500, 833) // replace with your desired width and height
-        firstPlayerCard.layoutParams = layoutParams0
-        val textBox0 = firstPlayerCard.findViewById<TextView>(R.id.cardLabel)
-        textBox0.text = "Player 2"
-        val imageBox0 = firstPlayerCard.findViewById<ImageView>(R.id.cardImage)
-        imageBox0.setImageResource(card.imgId)
-        firstPlayerCard.setOnClickListener{
-            game.attack(card, 1)
+        val thirdPlayerCard = LayoutInflater.from(this).inflate(R.layout.card_view, playerHandLayout, false)
+        val layoutParams2 = createCardLayoutParams(500, 833) // replace with your desired width and height
+        thirdPlayerCard.layoutParams = layoutParams2
+        val textBox2 = thirdPlayerCard.findViewById<TextView>(R.id.cardLabel)
+        textBox2.text = "Player 4"
+        val imageBox2 = thirdPlayerCard.findViewById<ImageView>(R.id.cardImage)
+        imageBox2.setImageResource(R.drawable.pfp4)
+        thirdPlayerCard.setOnClickListener{
+            game.attack(card, 3)
         }
-        chooseCardLayout.addView(firstPlayerCard)
+        chooseCardLayout.addView(thirdPlayerCard)
 
         val secondPlayerCard = LayoutInflater.from(this).inflate(R.layout.card_view, playerHandLayout, false)
         val layoutParams1 = createCardLayoutParams(500, 833) // replace with your desired width and height
@@ -233,22 +321,23 @@ class MainActivity : AppCompatActivity() {
         val textBox1 = secondPlayerCard.findViewById<TextView>(R.id.cardLabel)
         textBox1.text = "Player 3"
         val imageBox1 = secondPlayerCard.findViewById<ImageView>(R.id.cardImage)
-        imageBox1.setImageResource(card.imgId)
+        imageBox1.setImageResource(R.drawable.pfp3)
         secondPlayerCard.setOnClickListener{
             game.attack(card, 2)
         }
         chooseCardLayout.addView(secondPlayerCard)
 
-        val thirdPlayerCard = LayoutInflater.from(this).inflate(R.layout.card_view, playerHandLayout, false)
-        val layoutParams2 = createCardLayoutParams(500, 833) // replace with your desired width and height
-        thirdPlayerCard.layoutParams = layoutParams2
-        val textBox2 = thirdPlayerCard.findViewById<TextView>(R.id.cardLabel)
-        textBox2.text = "Player 4"
-        val imageBox2 = thirdPlayerCard.findViewById<ImageView>(R.id.cardImage)
-        imageBox2.setImageResource(card.imgId)
-        thirdPlayerCard.setOnClickListener{
-            game.attack(card, 3)
+        val firstPlayerCard = LayoutInflater.from(this).inflate(R.layout.card_view, playerHandLayout, false)
+        val layoutParams0 = createCardLayoutParams(500, 833) // replace with your desired width and height
+        firstPlayerCard.layoutParams = layoutParams0
+        val textBox0 = firstPlayerCard.findViewById<TextView>(R.id.cardLabel)
+        textBox0.text = "Player 2"
+        val imageBox0 = firstPlayerCard.findViewById<ImageView>(R.id.cardImage)
+        imageBox0.setImageResource(R.drawable.pfp2)
+        firstPlayerCard.setOnClickListener{
+            game.attack(card, 1)
         }
-        chooseCardLayout.addView(thirdPlayerCard)
+        chooseCardLayout.addView(firstPlayerCard)
+
     }
 }
